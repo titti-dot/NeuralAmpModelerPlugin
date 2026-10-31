@@ -15,13 +15,22 @@
 // clang-format on
 #include "architecture.hpp"
 
+#if !defined(WEBVIEW_EDITOR_DELEGATE)
 #include "NeuralAmpModelerControls.h"
+#endif
 
 using namespace iplug;
+#if !defined(WEBVIEW_EDITOR_DELEGATE)
 using namespace igraphics;
+#endif
+
+#if defined(WEBVIEW_EDITOR_DELEGATE)
+#include "NAMFileDialog.h"
+#endif
 
 const double kDCBlockerFrequency = 5.0;
 
+#if !defined(WEBVIEW_EDITOR_DELEGATE)
 // Styles
 const IVColorSpec colorSpec{
   DEFAULT_BGCOLOR, // Background
@@ -68,6 +77,7 @@ EMsgBoxResult _ShowMessageBox(iplug::igraphics::IGraphics* pGraphics, const char
   return pGraphics->ShowMessageBox(str, caption, type);
 #endif
 }
+#endif // !defined(WEBVIEW_EDITOR_DELEGATE)
 
 const std::string kCalibrateInputParamName = "CalibrateInput";
 const bool kDefaultCalibrateInput = false;
@@ -97,6 +107,7 @@ NeuralAmpModeler::NeuralAmpModeler(const InstanceInfo& info)
 
   mNoiseGateTrigger.AddListener(&mNoiseGateGain);
 
+#if !defined(WEBVIEW_EDITOR_DELEGATE)
   mMakeGraphicsFunc = [&]() {
 
 #ifdef OS_IOS
@@ -312,6 +323,13 @@ NeuralAmpModeler::NeuralAmpModeler(const InstanceInfo& info)
     // pGraphics->GetControlWithTag(kCtrlTagOutNorm)->SetMouseEventsWhenDisabled(false);
     // pGraphics->GetControlWithTag(kCtrlTagCalibrateInput)->SetMouseEventsWhenDisabled(false);
   };
+#else // defined(WEBVIEW_EDITOR_DELEGATE)
+  mEditorInitFunc = [&]() {
+    LoadFile("index.html", GetBundleID());
+    EnableScroll(false);
+  };
+  SetMaxJSStringLength(4096);
+#endif // !defined(WEBVIEW_EDITOR_DELEGATE)
 }
 
 NeuralAmpModeler::~NeuralAmpModeler()
@@ -407,8 +425,10 @@ void NeuralAmpModeler::OnReset()
   // I'm ignoring the model & IR, but it's not the end of the world.
   const int tailCycles = 10;
   SetTailSize(tailCycles * (int)(sampleRate / kDCBlockerFrequency));
+#if !defined(WEBVIEW_EDITOR_DELEGATE)
   mInputSender.Reset(sampleRate);
   mOutputSender.Reset(sampleRate);
+#endif
   // If there is a model or IR loaded, they need to be checked for resampling.
   _ResetModelAndIR(sampleRate, GetBlockSize());
   mToneStack->Reset(sampleRate, maxBlockSize);
@@ -417,6 +437,7 @@ void NeuralAmpModeler::OnReset()
 
 void NeuralAmpModeler::OnIdle()
 {
+#if !defined(WEBVIEW_EDITOR_DELEGATE)
   mInputSender.TransmitData(*this);
   mOutputSender.TransmitData(*this);
 
@@ -445,6 +466,17 @@ void NeuralAmpModeler::OnIdle()
       mModelCleared = false;
     }
   }
+#else // defined(WEBVIEW_EDITOR_DELEGATE)
+  if (mNewModelLoadedInDSP)
+  {
+    _UpdateControlsFromModel();
+    mNewModelLoadedInDSP = false;
+  }
+  if (mModelCleared)
+  {
+    mModelCleared = false;
+  }
+#endif // !defined(WEBVIEW_EDITOR_DELEGATE)
 }
 
 bool NeuralAmpModeler::SerializeState(IByteChunk& chunk) const
@@ -484,6 +516,7 @@ void NeuralAmpModeler::OnUIOpen()
 {
   Plugin::OnUIOpen();
 
+#if !defined(WEBVIEW_EDITOR_DELEGATE)
   if (mNAMPath.GetLength())
   {
     SendControlMsgFromDelegate(kCtrlTagModelFileBrowser, kMsgTagLoadedModel, mNAMPath.GetLength(), mNAMPath.Get());
@@ -504,6 +537,14 @@ void NeuralAmpModeler::OnUIOpen()
   {
     _UpdateControlsFromModel();
   }
+#else // defined(WEBVIEW_EDITOR_DELEGATE)
+  // All params were already sent by Plugin::OnUIOpen() → SendCurrentParamValuesFromDelegate().
+  // Now additionally sync model/IR names so the Angular UI can display them.
+  if (mNAMPath.GetLength())
+    SendArbitraryMsgFromDelegate(kMsgTagLoadedModel, mNAMPath.GetLength() + 1, mNAMPath.Get());
+  if (mIRPath.GetLength())
+    SendArbitraryMsgFromDelegate(kMsgTagLoadedIR, mIRPath.GetLength() + 1, mIRPath.Get());
+#endif // !defined(WEBVIEW_EDITOR_DELEGATE)
 }
 
 void NeuralAmpModeler::OnParamChange(int paramIdx)
@@ -528,6 +569,7 @@ void NeuralAmpModeler::OnParamChange(int paramIdx)
 
 void NeuralAmpModeler::OnParamChangeUI(int paramIdx, EParamSource source)
 {
+#if !defined(WEBVIEW_EDITOR_DELEGATE)
   if (auto pGraphics = GetUI())
   {
     bool active = GetParam(paramIdx)->Bool();
@@ -542,6 +584,7 @@ void NeuralAmpModeler::OnParamChangeUI(int paramIdx, EParamSource source)
       default: break;
     }
   }
+#endif // !defined(WEBVIEW_EDITOR_DELEGATE)
 }
 
 bool NeuralAmpModeler::OnMessage(int msgTag, int ctrlTag, int dataSize, const void* pData)
@@ -550,6 +593,7 @@ bool NeuralAmpModeler::OnMessage(int msgTag, int ctrlTag, int dataSize, const vo
   {
     case kMsgTagClearModel: mShouldRemoveModel = true; return true;
     case kMsgTagClearIR: mShouldRemoveIR = true; return true;
+#if !defined(WEBVIEW_EDITOR_DELEGATE)
     case kMsgTagHighlightColor:
     {
       mHighLightColor.Set((const char*)pData);
@@ -572,6 +616,31 @@ bool NeuralAmpModeler::OnMessage(int msgTag, int ctrlTag, int dataSize, const vo
 
       return true;
     }
+#endif // !defined(WEBVIEW_EDITOR_DELEGATE)
+#if defined(WEBVIEW_EDITOR_DELEGATE)
+    case kMsgTagRequestLoadModel:
+    {
+      NAM_OpenModelFileDialog([this](const std::string& path) {
+        if (!path.empty())
+        {
+          WDL_String wPath(path.c_str());
+          _StageModel(wPath);
+        }
+      });
+      return true;
+    }
+    case kMsgTagRequestLoadIR:
+    {
+      NAM_OpenIRFileDialog([this](const std::string& path) {
+        if (!path.empty())
+        {
+          WDL_String wPath(path.c_str());
+          _StageIR(wPath);
+        }
+      });
+      return true;
+    }
+#endif // defined(WEBVIEW_EDITOR_DELEGATE)
     default: return false;
   }
 }
@@ -769,11 +838,19 @@ std::string NeuralAmpModeler::_StageModel(const WDL_String& modelPath)
     }
     mStagedModel = std::move(temp);
     mNAMPath = modelPath;
+#if !defined(WEBVIEW_EDITOR_DELEGATE)
     SendControlMsgFromDelegate(kCtrlTagModelFileBrowser, kMsgTagLoadedModel, mNAMPath.GetLength(), mNAMPath.Get());
+#else
+    SendArbitraryMsgFromDelegate(kMsgTagLoadedModel, mNAMPath.GetLength() + 1, mNAMPath.Get());
+#endif
   }
   catch (std::runtime_error& e)
   {
+#if !defined(WEBVIEW_EDITOR_DELEGATE)
     SendControlMsgFromDelegate(kCtrlTagModelFileBrowser, kMsgTagLoadFailed);
+#else
+    SendArbitraryMsgFromDelegate(kMsgTagLoadFailed, 1, "");
+#endif
 
     if (mStagedModel != nullptr)
     {
@@ -809,7 +886,11 @@ dsp::wav::LoadReturnCode NeuralAmpModeler::_StageIR(const WDL_String& irPath)
   if (wavState == dsp::wav::LoadReturnCode::SUCCESS)
   {
     mIRPath = irPath;
+#if !defined(WEBVIEW_EDITOR_DELEGATE)
     SendControlMsgFromDelegate(kCtrlTagIRFileBrowser, kMsgTagLoadedIR, mIRPath.GetLength(), mIRPath.Get());
+#else
+    SendArbitraryMsgFromDelegate(kMsgTagLoadedIR, mIRPath.GetLength() + 1, mIRPath.Get());
+#endif
   }
   else
   {
@@ -818,7 +899,11 @@ dsp::wav::LoadReturnCode NeuralAmpModeler::_StageIR(const WDL_String& irPath)
       mStagedIR = nullptr;
     }
     mIRPath = previousIRPath;
+#if !defined(WEBVIEW_EDITOR_DELEGATE)
     SendControlMsgFromDelegate(kCtrlTagIRFileBrowser, kMsgTagLoadFailed);
+#else
+    SendArbitraryMsgFromDelegate(kMsgTagLoadFailed, 1, "");
+#endif
   }
 
   return wavState;
@@ -934,6 +1019,7 @@ void NeuralAmpModeler::_UpdateControlsFromModel()
   {
     return;
   }
+#if !defined(WEBVIEW_EDITOR_DELEGATE)
   if (auto* pGraphics = GetUI())
   {
     ModelInfo modelInfo;
@@ -961,6 +1047,9 @@ void NeuralAmpModeler::_UpdateControlsFromModel()
       pSlimIcon->Hide(!show);
     }
   }
+#endif // !defined(WEBVIEW_EDITOR_DELEGATE)
+  // WebView: model path was already sent via SendArbitraryMsgFromDelegate in _StageModel.
+  // Angular reads param values via the standard SPVFD channel.
 }
 
 void NeuralAmpModeler::_UpdateLatency()
@@ -982,10 +1071,12 @@ void NeuralAmpModeler::_UpdateLatency()
 void NeuralAmpModeler::_UpdateMeters(sample** inputPointer, sample** outputPointer, const size_t nFrames,
                                      const size_t nChansIn, const size_t nChansOut)
 {
+#if !defined(WEBVIEW_EDITOR_DELEGATE)
   // Right now, we didn't specify MAXNC when we initialized these, so it's 1.
   const int nChansHack = 1;
   mInputSender.ProcessBlock(inputPointer, (int)nFrames, kCtrlTagInputMeter, nChansHack);
   mOutputSender.ProcessBlock(outputPointer, (int)nFrames, kCtrlTagOutputMeter, nChansHack);
+#endif // !defined(WEBVIEW_EDITOR_DELEGATE)
 }
 
 // HACK

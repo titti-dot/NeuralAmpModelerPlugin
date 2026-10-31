@@ -480,6 +480,16 @@
 		C2A2FAE162D0000120027AB66 /* wavenet/a2_fast.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2A2FAE012D0000110027AB66 /* wavenet/a2_fast.cpp */; };
 		C2A2FAE172D0000120027AB66 /* wavenet/a2_fast.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2A2FAE012D0000110027AB66 /* wavenet/a2_fast.cpp */; };
 		C2A2FAE182D0000120027AB66 /* wavenet/a2_fast.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C2A2FAE012D0000110027AB66 /* wavenet/a2_fast.cpp */; };
+		BB120001231440B400CAFE01 /* web in Resources */ = {isa = PBXBuildFile; fileRef = 4FC46E57231440B4000045E7 /* web */; };
+		BB120002231440B400CAFE02 /* web in Resources */ = {isa = PBXBuildFile; fileRef = 4FC46E57231440B4000045E7 /* web */; };
+		BB120003231440B400CAFE03 /* web in Resources */ = {isa = PBXBuildFile; fileRef = 4FC46E57231440B4000045E7 /* web */; };
+		BB120004231440B400CAFE04 /* web in Resources */ = {isa = PBXBuildFile; fileRef = 4FC46E57231440B4000045E7 /* web */; };
+		BB120011231440B400CAFE11 /* NAMFileDialog.mm in Sources */ = {isa = PBXBuildFile; fileRef = BB120010231440B400CAFE10 /* NAMFileDialog.mm */; };
+		BB120012231440B400CAFE12 /* NAMFileDialog.mm in Sources */ = {isa = PBXBuildFile; fileRef = BB120010231440B400CAFE10 /* NAMFileDialog.mm */; };
+		BB120013231440B400CAFE13 /* NAMFileDialog.mm in Sources */ = {isa = PBXBuildFile; fileRef = BB120010231440B400CAFE10 /* NAMFileDialog.mm */; };
+		BB120014231440B400CAFE14 /* NAMFileDialog.mm in Sources */ = {isa = PBXBuildFile; fileRef = BB120010231440B400CAFE10 /* NAMFileDialog.mm */; };
+		BB120021231440B400CAFE21 /* IPlugWebView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4F7C49BE255DE0E200DF7588 /* IPlugWebView.mm */; settings = {COMPILER_FLAGS = "-fobjc-arc"; }; };
+		BB120022231440B400CAFE22 /* IPlugWebViewEditorDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 4F7C49BA255DE0E200DF7588 /* IPlugWebViewEditorDelegate.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -979,6 +989,7 @@
 		4FC3EFED2086CE5600BD11FA /* stringconvert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stringconvert.h; sourceTree = "<group>"; };
 		4FC3EFEE2086CE5600BD11FA /* uid.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = uid.h; sourceTree = "<group>"; };
 		4FC46E57231440B4000045E7 /* web */ = {isa = PBXFileReference; lastKnownFileType = folder; name = web; path = ../resources/web; sourceTree = "<group>"; };
+		BB120010231440B400CAFE10 /* NAMFileDialog.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = NAMFileDialog.mm; path = ../NAMFileDialog.mm; sourceTree = "<group>"; };
 		4FC82B4620BD522B00722133 /* fonts */ = {isa = PBXFileReference; lastKnownFileType = folder; name = fonts; path = ../resources/fonts; sourceTree = "<group>"; };
 		4FCDB64822C849D200698A4B /* IGraphicsSkia.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = IGraphicsSkia.cpp; sourceTree = "<group>"; };
 		4FCDB64922C849D200698A4B /* IGraphicsSkia.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = IGraphicsSkia.h; sourceTree = "<group>"; };
@@ -2344,6 +2355,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB120003231440B400CAFE03 /* web in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2375,6 +2387,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB120002231440B400CAFE02 /* web in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2391,6 +2404,7 @@
 			files = (
 				4F1B4AE42014D33600BC64D4 /* NeuralAmpModeler-macOS-MainMenu.xib in Resources */,
 				4F037D76261F9DB400A752B5 /* Images.xcassets in Resources */,
+				BB120001231440B400CAFE01 /* web in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2398,6 +2412,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB120004231440B400CAFE04 /* web in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2594,6 +2609,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB120013231440B400CAFE13 /* NAMFileDialog.mm in Sources */,
 				4F2FB1942A0047430027AB66 /* dsp.cpp in Sources */,
 				4F7C495F255DDFC500DF7588 /* IPopupMenuControl.cpp in Sources */,
 				4F2FB1C72A0047430027AB66 /* get_dsp.cpp in Sources */,
@@ -2744,6 +2760,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB120012231440B400CAFE12 /* NAMFileDialog.mm in Sources */,
 				4F81597C205D50EB00393585 /* baseiids.cpp in Sources */,
 				4FDAC0EC207D76C600299363 /* IPlugTimer.cpp in Sources */,
 				4F7C495D255DDFC400DF7588 /* ITextEntryControl.cpp in Sources */,
@@ -2887,6 +2904,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB120011231440B400CAFE11 /* NAMFileDialog.mm in Sources */,
 				4F2FB1A62A0047430027AB66 /* lstm.cpp in Sources */,
 				B885CBC52304AE7300D73128 /* IPlugProcessor.cpp in Sources */,
 				4F10D3D9203A6719003EF82A /* RtMidi.cpp in Sources */,
@@ -2939,6 +2957,8 @@
 				4F2FB17E2A0047430027AB66 /* wav.cpp in Sources */,
 				4F78D91813B63BA50032E0F3 /* IPlugParameter.cpp in Sources */,
 				4FDAC0EA207D76C600299363 /* IPlugTimer.cpp in Sources */,
+				BB120021231440B400CAFE21 /* IPlugWebView.mm in Sources */,
+				BB120022231440B400CAFE22 /* IPlugWebViewEditorDelegate.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2946,6 +2966,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB120014231440B400CAFE14 /* NAMFileDialog.mm in Sources */,
 				4F2FB1832A0047430027AB66 /* wav.cpp in Sources */,
 				4F2FB16E2A0047430027AB66 /* NoiseGate.cpp in Sources */,
 				4FFBB90520863B0E00DDD0E7 /* baseiids.cpp in Sources */,

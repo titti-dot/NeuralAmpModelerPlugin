@@ -1,0 +1,241 @@
+$bg: #1a1a1a;
+$surface: #242424;
+$border: #333;
+$accent: #e87a2a;
+$text: #e0e0e0;
+$muted: #888;
+$disabled: #444;
+
+.plugin-shell {
+  background: $bg;
+  color: $text;
+  font-family: 'Inter', 'Helvetica Neue', sans-serif;
+  font-size: 12px;
+  min-height: 100vh;
+  padding: 12px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+// ── Header ───────────────────────────────────────────────
+.plugin-header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  padding: 4px 0 8px;
+  border-bottom: 1px solid $border;
+
+  .logo {
+    font-size: 22px;
+    font-weight: 700;
+    color: $accent;
+    letter-spacing: 3px;
+  }
+
+  .subtitle {
+    font-size: 11px;
+    color: $muted;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .error-badge {
+    margin-left: auto;
+    background: #6b1c1c;
+    color: #ffaaaa;
+    padding: 2px 8px;
+    border-radius: 3px;
+    font-size: 10px;
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+// ── Cards ─────────────────────────────────────────────────
+.card {
+  background: $surface;
+  border: 1px solid $border;
+  border-radius: 6px;
+  padding: 10px 12px;
+}
+
+.card-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: $muted;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+// ── Main controls row ─────────────────────────────────────
+.controls-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1.5fr 1fr;
+  gap: 10px;
+}
+
+// ── Model / IR cards ──────────────────────────────────────
+.model-card, .ir-card {
+  .model-name {
+    font-size: 13px;
+    color: $text;
+    margin-bottom: 8px;
+    min-height: 18px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.calib-card {
+  max-width: 340px;
+}
+
+// ── Buttons ───────────────────────────────────────────────
+.btn-row {
+  display: flex;
+  gap: 8px;
+}
+
+.btn {
+  border: none;
+  border-radius: 4px;
+  padding: 5px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: opacity 0.1s;
+
+  &:disabled { opacity: 0.35; cursor: default; }
+
+  &.btn-primary {
+    background: $accent;
+    color: #1a1a1a;
+    &:not(:disabled):hover { opacity: 0.85; }
+  }
+
+  &.btn-ghost {
+    background: transparent;
+    color: $muted;
+    border: 1px solid $border;
+    &:hover { color: $text; border-color: $text; }
+  }
+}
+
+// ── Sliders ───────────────────────────────────────────────
+.slider-label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  font-size: 11px;
+
+  .val {
+    color: $accent;
+    font-variant-numeric: tabular-nums;
+    min-width: 60px;
+    text-align: right;
+  }
+}
+
+input[type='range'] {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 4px;
+  background: $border;
+  border-radius: 2px;
+  outline: none;
+  margin-bottom: 10px;
+  cursor: pointer;
+
+  &:disabled { opacity: 0.35; cursor: default; }
+
+  &::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: $accent;
+    cursor: pointer;
+    border: 2px solid $bg;
+    box-shadow: 0 0 0 1px $accent;
+  }
+}
+
+// ── Toggle switch ─────────────────────────────────────────
+.toggle {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+  margin-left: auto;
+
+  input { position: absolute; opacity: 0; width: 0; height: 0; }
+
+  .toggle-track {
+    display: inline-block;
+    width: 28px;
+    height: 16px;
+    background: $disabled;
+    border-radius: 8px;
+    transition: background 0.2s;
+    position: relative;
+
+    &::after {
+      content: '';
+      position: absolute;
+      top: 2px;
+      left: 2px;
+      width: 12px;
+      height: 12px;
+      background: $muted;
+      border-radius: 50%;
+      transition: transform 0.2s, background 0.2s;
+    }
+  }
+
+  input:checked + .toggle-track {
+    background: rgba($accent, 0.35);
+    &::after {
+      transform: translateX(12px);
+      background: $accent;
+    }
+  }
+}
+
+// ── Enum buttons ──────────────────────────────────────────
+.enum-row {
+  display: flex;
+  gap: 4px;
+}
+
+.enum-btn {
+  flex: 1;
+  border: 1px solid $border;
+  background: transparent;
+  color: $muted;
+  border-radius: 3px;
+  padding: 4px 6px;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.1s;
+
+  &:hover { color: $text; border-color: $text; }
+
+  &.active {
+    background: $accent;
+    border-color: $accent;
+    color: #1a1a1a;
+  }
+}

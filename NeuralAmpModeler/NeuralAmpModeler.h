@@ -74,6 +74,9 @@ enum EMsgTags
   kMsgTagClearModel = 0,
   kMsgTagClearIR,
   kMsgTagHighlightColor,
+  // WebView only: JS → DSP requests to open the native file picker
+  kMsgTagRequestLoadModel,
+  kMsgTagRequestLoadIR,
   // The following tags are from DSP -> UI
   kMsgTagLoadFailed,
   kMsgTagLoadedModel,
@@ -323,5 +326,7 @@ private:
 
   std::unordered_map<std::string, double> mNAMParams = {{"Input", 0.0}, {"Output", 0.0}};
 
+#if !defined(WEBVIEW_EDITOR_DELEGATE)
   NAMSender mInputSender, mOutputSender;
+#endif
 };

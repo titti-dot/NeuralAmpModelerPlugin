@@ -1,0 +1,162 @@
+<div class="plugin-shell">
+
+  <!-- ── HEADER ── -->
+  <header class="plugin-header">
+    <span class="logo">NAM</span>
+    <span class="subtitle">Neural Amp Modeler</span>
+    @if (bridge.loadError()) {
+      <span class="error-badge">{{ bridge.loadError() }}</span>
+    }
+  </header>
+
+  <!-- ── MODEL ── -->
+  <section class="card model-card">
+    <div class="card-label">Model</div>
+    <div class="model-name">{{ modelBaseName() || '— no model loaded —' }}</div>
+    <div class="btn-row">
+      <button class="btn btn-primary" (click)="bridge.requestLoadModel()">Load Model</button>
+      @if (bridge.modelPath()) {
+        <button class="btn btn-ghost" (click)="bridge.clearModel()">Clear</button>
+      }
+    </div>
+  </section>
+
+  <!-- ── MAIN CONTROLS ── -->
+  <div class="controls-row">
+
+    <!-- Input -->
+    <section class="card">
+      <div class="card-label">Input</div>
+      <label class="slider-label">
+        <span>Level</span><span class="val">{{ bridge.inputLevel() | number:'1.1-1' }} dB</span>
+      </label>
+      <input type="range"
+             [min]="-20" [max]="20" [step]="0.1"
+             [value]="bridge.inputLevel()"
+             (mousedown)="onSliderStart('inputLevel')"
+             (input)="onSliderChange('inputLevel', +$any($event.target).value)"
+             (change)="onSliderEnd('inputLevel')" />
+    </section>
+
+    <!-- Noise Gate -->
+    <section class="card">
+      <div class="card-label">
+        Noise Gate
+        <label class="toggle">
+          <input type="checkbox"
+                 [checked]="bridge.noiseGateActive()"
+                 (change)="bridge.setBool('noiseGateActive', $any($event.target).checked)" />
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+      <label class="slider-label">
+        <span>Threshold</span><span class="val">{{ bridge.noiseGateThreshold() | number:'1.0-0' }} dB</span>
+      </label>
+      <input type="range"
+             [min]="-100" [max]="0" [step]="0.1"
+             [value]="bridge.noiseGateThreshold()"
+             [disabled]="!bridge.noiseGateActive()"
+             (mousedown)="onSliderStart('noiseGateThreshold')"
+             (input)="onSliderChange('noiseGateThreshold', +$any($event.target).value)"
+             (change)="onSliderEnd('noiseGateThreshold')" />
+    </section>
+
+    <!-- Tone Stack -->
+    <section class="card">
+      <div class="card-label">
+        Tone Stack
+        <label class="toggle">
+          <input type="checkbox"
+                 [checked]="bridge.eqActive()"
+                 (change)="bridge.setBool('eqActive', $any($event.target).checked)" />
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+      @for (param of [
+        { name: 'toneBass',   label: 'Bass'   },
+        { name: 'toneMid',    label: 'Mid'    },
+        { name: 'toneTreble', label: 'Treble' }
+      ]; track param.name) {
+        <label class="slider-label">
+          <span>{{ param.label }}</span>
+          <span class="val">{{ $any(bridge)[$any(param.name)]() | number:'1.1-1' }}</span>
+        </label>
+        <input type="range"
+               [min]="0" [max]="10" [step]="0.1"
+               [value]="$any(bridge)[$any(param.name)]()"
+               [disabled]="!bridge.eqActive()"
+               (mousedown)="onSliderStart($any(param.name))"
+               (input)="onSliderChange($any(param.name), +$any($event.target).value)"
+               (change)="onSliderEnd($any(param.name))" />
+      }
+    </section>
+
+    <!-- Output -->
+    <section class="card">
+      <div class="card-label">Output</div>
+      <label class="slider-label">
+        <span>Level</span><span class="val">{{ bridge.outputLevel() | number:'1.1-1' }} dB</span>
+      </label>
+      <input type="range"
+             [min]="-40" [max]="40" [step]="0.1"
+             [value]="bridge.outputLevel()"
+             (mousedown)="onSliderStart('outputLevel')"
+             (input)="onSliderChange('outputLevel', +$any($event.target).value)"
+             (change)="onSliderEnd('outputLevel')" />
+
+      <div class="card-label" style="margin-top:12px">Output Mode</div>
+      <div class="enum-row">
+        @for (lbl of outputModeLabels; track $index) {
+          <button class="enum-btn"
+                  [class.active]="bridge.outputMode() === $index"
+                  (click)="bridge.setEnum('outputMode', $index)">{{ lbl }}</button>
+        }
+      </div>
+    </section>
+
+  </div>
+
+  <!-- ── IR ── -->
+  <section class="card ir-card">
+    <div class="card-label">
+      Impulse Response
+      <label class="toggle">
+        <input type="checkbox"
+               [checked]="bridge.irToggle()"
+               (change)="bridge.setBool('irToggle', $any($event.target).checked)" />
+        <span class="toggle-track"></span>
+      </label>
+    </div>
+    <div class="model-name">{{ irBaseName() || '— no IR loaded —' }}</div>
+    <div class="btn-row">
+      <button class="btn btn-primary" [disabled]="!bridge.irToggle()" (click)="bridge.requestLoadIR()">Load IR</button>
+      @if (bridge.irPath()) {
+        <button class="btn btn-ghost" (click)="bridge.clearIR()">Clear</button>
+      }
+    </div>
+  </section>
+
+  <!-- ── CALIBRATION ── -->
+  <section class="card calib-card">
+    <div class="card-label">
+      Input Calibration
+      <label class="toggle">
+        <input type="checkbox"
+               [checked]="bridge.calibrateInput()"
+               (change)="bridge.setBool('calibrateInput', $any($event.target).checked)" />
+        <span class="toggle-track"></span>
+      </label>
+    </div>
+    <label class="slider-label">
+      <span>Level</span><span class="val">{{ bridge.inputCalibrationLevel() | number:'1.1-1' }} dBu</span>
+    </label>
+    <input type="range"
+           [min]="-60" [max]="60" [step]="0.1"
+           [value]="bridge.inputCalibrationLevel()"
+           [disabled]="!bridge.calibrateInput()"
+           (mousedown)="onSliderStart('inputCalibrationLevel')"
+           (input)="onSliderChange('inputCalibrationLevel', +$any($event.target).value)"
+           (change)="onSliderEnd('inputCalibrationLevel')" />
+  </section>
+
+</div>
